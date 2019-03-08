@@ -76,7 +76,7 @@
         
   
     <h1 itemprop="name">
-      <a class="article-title" href="/2019/03/05/hello-world/">网页在上传到服务器后无法正常跳转的解决方法（nginx 404错误）</a>
+      <a class="article-title" href="/2019/03/05/hello-world/">网页在上传到服务器后无法正常跳转的解决方法（错误页面：404 Not Found nginx/版本号）</a>
     </h1>
   
 
@@ -84,20 +84,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>前段时间自己写了一个网站(myheroes.xyz)，上传服务器后可以正常渲染首页，但无法正常跳转其他页面</p>
-<h2 id="问题产生"><a href="#问题产生" class="headerlink" title="问题产生"></a>问题产生</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"></span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-<p>More info: <a href="https://hexo.io/docs/deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+        <p>前段时间自己写了一个网站myheroes.xyz,上传到服务器后可以正常渲染首页，但无法跳转到其他页面，一跳就报404 Not Found nginx/版本号错误</p>
+<h2 id="问题分析"><a href="#问题分析" class="headerlink" title="问题分析"></a>问题分析</h2><h3 id="首先想到有没有可能是路径的问题，因为我是用vue码的网站，而vue项目目录下的config-index-js里有两个关于路径的配置，一个是在本机调试时dev下assetsPublicPath的配置"><a href="#首先想到有没有可能是路径的问题，因为我是用vue码的网站，而vue项目目录下的config-index-js里有两个关于路径的配置，一个是在本机调试时dev下assetsPublicPath的配置" class="headerlink" title="首先想到有没有可能是路径的问题，因为我是用vue码的网站，而vue项目目录下的config/index.js里有两个关于路径的配置，一个是在本机调试时dev下assetsPublicPath的配置"></a>首先想到有没有可能是路径的问题，因为我是用vue码的网站，而vue项目目录下的config/index.js里有两个关于路径的配置，一个是在本机调试时dev下assetsPublicPath的配置</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">dev: &#123;</span><br><span class="line"></span><br><span class="line">  	 ...</span><br><span class="line">   	 assetsPublicPath: &apos;/&apos;,</span><br><span class="line"> 	 ...</span><br></pre></td></tr></table></figure>
+<p>这里用’/‘是对的，默认也是这个，如果不小心改错了，调试时页面会渲染出cannot get /的错误</p>
+<h3 id="还有一个是打包上传到服务器时的路径配置，在build代码段里的assetsPublicPath"><a href="#还有一个是打包上传到服务器时的路径配置，在build代码段里的assetsPublicPath" class="headerlink" title="还有一个是打包上传到服务器时的路径配置，在build代码段里的assetsPublicPath"></a>还有一个是打包上传到服务器时的路径配置，在build代码段里的assetsPublicPath</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">build: &#123;</span><br><span class="line">  	...</span><br><span class="line">    assetsPublicPath: &apos;/&apos;,</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+<p>这里也是’/‘，默认也是，至于为什么不用改为’./‘，很明显vue的配置文件已经把’/‘看做根目录，所有的路径查询都会从根目录开始，而加个’.’后配置文件就识别不了了</p>
+<p>确认自己没有手滑加’.’后，自己也在本机上运行项目，网页的跳转也没有问题，这时就把问题转移到服务器的配置文件上</p>
+<h3 id="nginx-conf配置文件"><a href="#nginx-conf配置文件" class="headerlink" title="nginx.conf配置文件"></a>nginx.conf配置文件</h3><p>nginx.conf配置文件上有关跳转的配置就集中在location代码段上，在网上查询了其他人的nginx配置后，终于找到了问题，因为我的vue项目路由使用了history模式，而与之匹配的，就需要我在配置文件里将客户端所请求的url进行重定向操作，这个重定向操作作用在用户执行网页跳转时，而我漏掉了这个配置，所以我只能渲染出首页，再进行跳转就会报错</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">location / &#123;</span><br><span class="line">	...</span><br><span class="line">  	try_files $uri $uri/ /index.html last;</span><br><span class="line">  	...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>之后再重启nginx后，页面就可以正常跳转了</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/03/05/hello-world/" data-id="cjszux46f0000zcvkjri3y2yi" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/03/05/hello-world/" data-id="cjt0329rq0000q4vkxniqib3g" class="article-share-link">Share</a>
       
       
     </footer>
@@ -138,7 +138,7 @@
       <ul>
         
           <li>
-            <a href="/2019/03/05/hello-world/">网页在上传到服务器后无法正常跳转的解决方法（nginx 404错误）</a>
+            <a href="/2019/03/05/hello-world/">网页在上传到服务器后无法正常跳转的解决方法（错误页面：404 Not Found nginx/版本号）</a>
           </li>
         
       </ul>
