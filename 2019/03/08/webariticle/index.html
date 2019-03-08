@@ -5,20 +5,21 @@
   
 
   
-  <title>码微信小程序时对于主要功能的实现分析（用户点赞和评论） | Spidey  World</title>
+  <title>码微信小程序时对于主要功能的实现分析（用户阅读数、点赞和评论） | Spidey  World</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="先放上自己的小程序：小深眼中的英雄宇宙">
+  <meta name="description" content="先放上自己的小程序：小深眼中的英雄宇宙  在制作小程序时，需要引入点赞和评论功能  点赞功能需要保存用户点赞后的状态，这里可以用StorageSync缓存来实现，类似一个轻便的数据库，里面存入了up_status的点赞状态字段 1234567891011121314...//将点赞状态赋值给up_statusif (!postData.up_status) &amp;#123;          post">
 <meta property="og:type" content="article">
-<meta property="og:title" content="码微信小程序时对于主要功能的实现分析（用户点赞和评论）">
+<meta property="og:title" content="码微信小程序时对于主要功能的实现分析（用户阅读数、点赞和评论）">
 <meta property="og:url" content="http://yoursite.com/2019/03/08/webariticle/index.html">
 <meta property="og:site_name" content="Spidey  World">
-<meta property="og:description" content="先放上自己的小程序：小深眼中的英雄宇宙">
+<meta property="og:description" content="先放上自己的小程序：小深眼中的英雄宇宙  在制作小程序时，需要引入点赞和评论功能  点赞功能需要保存用户点赞后的状态，这里可以用StorageSync缓存来实现，类似一个轻便的数据库，里面存入了up_status的点赞状态字段 1234567891011121314...//将点赞状态赋值给up_statusif (!postData.up_status) &amp;#123;          post">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://yoursite.com/2019/03/08/webariticle/logo.jpg">
-<meta property="og:updated_time" content="2019-03-08T13:43:17.611Z">
+<meta property="og:image" content="http://yoursite.com/2019/03/08/webariticle/logo1.jpg">
+<meta property="og:updated_time" content="2019-03-08T14:37:10.560Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="码微信小程序时对于主要功能的实现分析（用户点赞和评论）">
-<meta name="twitter:description" content="先放上自己的小程序：小深眼中的英雄宇宙">
+<meta name="twitter:title" content="码微信小程序时对于主要功能的实现分析（用户阅读数、点赞和评论）">
+<meta name="twitter:description" content="先放上自己的小程序：小深眼中的英雄宇宙  在制作小程序时，需要引入点赞和评论功能  点赞功能需要保存用户点赞后的状态，这里可以用StorageSync缓存来实现，类似一个轻便的数据库，里面存入了up_status的点赞状态字段 1234567891011121314...//将点赞状态赋值给up_statusif (!postData.up_status) &amp;#123;          post">
 <meta name="twitter:image" content="http://yoursite.com/2019/03/08/webariticle/logo.jpg">
   
     <link rel="alternate" href="/atom.xml" title="Spidey  World" type="application/atom+xml">
@@ -80,7 +81,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      码微信小程序时对于主要功能的实现分析（用户点赞和评论）
+      码微信小程序时对于主要功能的实现分析（用户阅读数、点赞和评论）
     </h1>
   
 
@@ -88,12 +89,20 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <p>先放上自己的小程序：小深眼中的英雄宇宙<br><img src="/2019/03/08/webariticle/logo.jpg" alt></p>
+        <p>先放上自己的小程序：小深眼中的英雄宇宙</p>
+<p><img src="/2019/03/08/webariticle/logo.jpg" alt></p>
+<p>在制作小程序时，需要引入点赞和评论功能</p>
+<p><img src="/2019/03/08/webariticle/logo1.jpg" alt></p>
+<p>点赞功能需要保存用户点赞后的状态，这里可以用StorageSync缓存来实现，类似一个轻便的数据库，里面存入了up_status的点赞状态字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">//将点赞状态赋值给up_status</span><br><span class="line">if (!postData.up_status) &#123;</span><br><span class="line">          postData.up_status = true;</span><br><span class="line">        &#125; else &#123;</span><br><span class="line">          postData.up_status = false;</span><br><span class="line">        &#125;</span><br><span class="line">...   </span><br><span class="line"></span><br><span class="line">...</span><br><span class="line">this.execSetStorageSync(allPostData);//将点赞状态存入缓存</span><br><span class="line">    return postData;//给用户一个实时的点赞反馈，我这里在之后将postData关联到点赞的动画上</span><br><span class="line"></span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>阅读数和评论功能可以使用云服务器的数据库和云函数来实现CRUD操作，我这里直接使用小程序自带的云开发功能</p>
+<p>在云服务器里创建好数据库后，利用云函数来操作数据库里的字段就可以了</p>
+<p>例如：用户在点击某篇文章时执行数据库某条记录某个字段的+1操作，在进入文章页面时执行查询这个字段的函数，最后显示在页面上</p>
 
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/03/08/webariticle/" data-id="cjt045bzq0001lcvkhavtjlm4" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/03/08/webariticle/" data-id="cjt05zkq00001zwvkz3ipc9pq" class="article-share-link">Share</a>
       
       
     </footer>
@@ -142,7 +151,7 @@
       <ul>
         
           <li>
-            <a href="/2019/03/08/webariticle/">码微信小程序时对于主要功能的实现分析（用户点赞和评论）</a>
+            <a href="/2019/03/08/webariticle/">码微信小程序时对于主要功能的实现分析（用户阅读数、点赞和评论）</a>
           </li>
         
           <li>
